@@ -1,14 +1,18 @@
 #include "../Header/matrix.h"
+#include <stack>
 
 class NeuralNetwork{
 	private:
 		vector<int> netDef;
-		vector<Matrix> weightMatricies;
-		Matrix output, expectedOut;
+		vector<Matrix> weightMatricies, weightChanges;
+		stack<Matrix> history;
+		Matrix output, expectedOut, input;
 		double sigmoid(double);
-		void activation(Matrix&);
+		double sigmoidPrime(double);
+		Matrix activation(Matrix, int);
 	public:
 		NeuralNetwork(vector<int>, Matrix, Matrix);
 		Matrix forward();
+		void costFuncPrime();
 
 };

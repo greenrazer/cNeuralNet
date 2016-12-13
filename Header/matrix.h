@@ -1,17 +1,22 @@
 class Matrix{
 	private:
 		double** mat;
-		void makeInitArray();
+		double** make2dArray(int, int);
+		Matrix doOperatorFunction(string, Matrix&);
 
 	public:
 		int height, width;
-		double at(int, int);
-		void set(int, int, double);
-		void add(int, int, double);
+		double* at(int, int);
 		void fillRandom();
 		void inputData();
+		void scale();
 		string toString();
 		string dimensions();
+		Matrix transpose();
+		Matrix operator+(Matrix&);
+		Matrix operator-(Matrix&);
+		Matrix operator-();
+		Matrix operator*(Matrix&);
 		Matrix(int, int);
 		Matrix();
 };

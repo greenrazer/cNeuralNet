@@ -7,30 +7,26 @@ using namespace std;
 
 #include "../Header/matrix.h"
 
-void Matrix::makeInitArray(){
-	mat = 0;
-	mat = new double*[height];
-	for (int h = 0; h < height; h++)
+double** Matrix::make2dArray(int hei, int wid){
+	double** temp = 0;
+	temp = new double*[hei];
+	for (int h = 0; h < hei; h++)
 	{
-		mat[h] = new double[width];
-		for (int w = 0; w < width; w++)
+		temp[h] = new double[wid];
+		for (int w = 0; w < wid; w++)
 		{
 			// fill in some initial values
-			mat[h][w] = 0.0;
+			temp[h][w] = 0.0;
 		}
 	}
+	return temp;
 }
 
-double Matrix::at(int x, int y){
-	return mat[x][y];
-}
-
-void Matrix::set(int x, int y, double z){
-	mat[x][y] = z;
-}
-
-void Matrix::add(int x, int y, double z){
-	mat[x][y] = z;
+double* Matrix::at(int x, int y){
+	if (x < 0 || y < 0 || x > height - 1 || y > width - 1){
+		throw invalid_argument("index out of bounds for matrix: " + dimensions());
+	}
+	return &mat[x][y];
 }
 
 void Matrix::inputData(){
@@ -70,27 +66,103 @@ void Matrix::fillRandom(){
 	}
 }
 
+void Matrix::scale(){
+	double max = mat[0][0];
+	for (int x = 0; x < height; x++){
+		for (int y = 0; y < width; y++){
+			if (mat[x][y] > max){
+				max = mat[x][y];
+			}
+		}
+	}
+	for (int x = 0; x < height; x++){
+		for (int y = 0; y < width; y++){
+			mat[x][y] /= max;
+		}
+	}
+}
+
+Matrix Matrix::transpose(){
+	double** temp = make2dArray(width, height);
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			temp[j][i] = mat[i][j];
+		}
+	}
+	mat = temp;
+	int save = height;
+	height = width;
+	width = save;
+	return *this;
+}
+
 Matrix::Matrix(int h, int w){
 	height = h;
 	width = w;
-	makeInitArray();
+	mat = make2dArray(height, width);
 }
 
 Matrix::Matrix(){
 
 }
 
-Matrix dotMatrices(Matrix a, Matrix b){
-	if (a.width != b.height){
-		throw invalid_argument("matrices not compatible for multiplication: " + a.dimensions() + " & " + b.dimensions());
+Matrix Matrix::operator*(Matrix& b) {
+	return doOperatorFunction("*", b);
+}
+
+Matrix Matrix::operator+(Matrix& b) {
+	return doOperatorFunction("+", b);
+}
+
+Matrix Matrix::operator-(Matrix& b) {
+	return doOperatorFunction("-", b);
+}
+
+Matrix Matrix::operator-() {
+	Matrix out(height, width);
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			*out.at(i, j) = 0 - *at(i, j);
+		}
 	}
-	Matrix out(a.height, b.width);
-	for (int i = 0; i < a.height; i++){
-		for (int j = 0; j < b.width; j++){
-			for (int q = 0; q < a.width; q++){
-				out.add(i, j, a.at(i, q) * b.at(q, j));
+	return out;
+}
+
+Matrix Matrix::doOperatorFunction(string anOper, Matrix& b){
+	if (width != b.width || height != b.height){
+		throw invalid_argument("matrices not compatible for multiplication: " + dimensions() + " & " + b.dimensions());
+	}
+	Matrix out(height, width);
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			if (anOper == "-"){
+				*out.at(i, j) = *at(i, j) - *b.at(i, j);
+			}
+			else if (anOper == "+"){
+				*out.at(i, j) = *at(i, j) + *b.at(i, j);
+			}
+			else if (anOper == "*"){
+				*out.at(i, j) = *at(i, j) * *b.at(i, j);
 			}
 		}
 	}
 	return out;
 }
+
+Matrix dotMatrices(Matrix a, Matrix b)
+	if (a.width != b.height){
+		cout << "matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions();
+		throw invalid_argument("matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions());
+	}
+	Matrix out(a.height, b.width);
+	for (int i = 0; i < a.height; i++){
+		for (int j = 0; j < b.width; j++){
+			for (int q = 0; q < a.width; q++){
+				*out.at(i, j) = *a.at(i, q) * *b.at(q, j);
+			}
+		}
+	}
+	return out;
+}
+
+//Matrix operator+(const Matrix&);
