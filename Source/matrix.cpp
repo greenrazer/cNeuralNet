@@ -149,7 +149,7 @@ Matrix Matrix::doOperatorFunction(string anOper, Matrix& b){
 	return out;
 }
 
-Matrix dotMatrices(Matrix a, Matrix b)
+Matrix dotMatrices(Matrix a, Matrix b){
 	if (a.width != b.height){
 		cout << "matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions();
 		throw invalid_argument("matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions());
