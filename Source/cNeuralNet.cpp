@@ -14,14 +14,57 @@ using namespace std;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	srand(time(0));
-	vector<int> v { 2, 3, 1 };
-	Matrix in(4, 2);
-	in.inputData();
-	Matrix out(4, 1);
-	out.inputData();
-	NeuralNetwork NN(v,in,out);
+
+	vector<vector<double>> anInput {
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 0, 1 },
+		{ 0, 0, 1, 0 },
+		{ 0, 0, 1, 1 },
+		{ 0, 1, 0, 0 },
+		{ 0, 1, 0, 1 },
+		{ 0, 1, 1, 0 },
+		{ 0, 1, 1, 1 },
+		{ 1, 0, 0, 0 },
+		{ 1, 0, 0, 1 },
+		{ 1, 0, 1, 0 },
+		{ 1, 0, 1, 1 },
+		{ 1, 1, 0, 0 },
+		{ 1, 1, 0, 1 },
+		{ 1, 1, 1, 0 },
+		{ 1, 1, 1, 1 },
+	};
+
+	vector<vector<double>> anOutput {
+		{ 0, 0, 0, 1 },
+		{ 0, 0, 1, 0 },
+		{ 0, 0, 1, 1 },
+		{ 0, 1, 0, 0 },
+		{ 0, 1, 0, 1 },
+		{ 0, 1, 1, 0 },
+		{ 0, 1, 1, 1 },
+		{ 1, 0, 0, 0 },
+		{ 1, 0, 0, 1 },
+		{ 1, 0, 1, 0 },
+		{ 1, 0, 1, 1 },
+		{ 1, 1, 0, 0 },
+		{ 1, 1, 0, 1 },
+		{ 1, 1, 1, 0 },
+		{ 1, 1, 1, 1 },
+		{ 0, 0, 0, 0 },
+	};
+	vector<int> networkDefinition { 4, 5, 4 };
+	Matrix in(16, 4);
+	in.inputData(anInput);
+	cout << endl;
+	Matrix out(16, 4);
+	out.inputData(anOutput);
+	NeuralNetwork NN(networkDefinition,in,out);
+	cout << endl << endl << endl;
+	for (int i = 0; i < 100; i++){
+		NN.forward();
+		NN.backProp();
+	}
 	cout << NN.forward().toString() << endl;
-	NN.costFuncPrime();
 	int a;
 	cin >> a;
 }

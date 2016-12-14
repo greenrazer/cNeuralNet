@@ -29,12 +29,18 @@ double* Matrix::at(int x, int y){
 	return &mat[x][y];
 }
 
-void Matrix::inputData(){
-	for (int x = 0; x < height; x++){
-		for (int y = 0; y < width; y++){
-			cin >> mat[x][y];
+void Matrix::inputData(vector<vector<double>> a){
+		for (int x = 0; x < height; x++){
+			for (int y = 0; y < width; y++){
+				if (a.empty()){
+					cin >> mat[x][y];
+				}
+				else{
+					mat[x][y] = a.at(x).at(y);
+				}
+			}
 		}
-	}
+
 	cout << toString();
 }
 
@@ -57,6 +63,7 @@ string Matrix::dimensions(){
 
 void Matrix::fillRandom(){
 	double d = 1/(sqrt(width));
+	//double d = 40;
 	double rnd;
 	for (int x = 0; x < height; x++){
 		for (int y = 0; y < width; y++){
@@ -83,17 +90,13 @@ void Matrix::scale(){
 }
 
 Matrix Matrix::transpose(){
-	double** temp = make2dArray(width, height);
+	Matrix temp(width, height);
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
-			temp[j][i] = mat[i][j];
+			*temp.at(j, i) = mat[i][j];
 		}
 	}
-	mat = temp;
-	int save = height;
-	height = width;
-	width = save;
-	return *this;
+	return temp;
 }
 
 Matrix::Matrix(int h, int w){
@@ -110,11 +113,23 @@ Matrix Matrix::operator*(Matrix& b) {
 	return doOperatorFunction("*", b);
 }
 
+Matrix Matrix::operator*(double& b) {
+	return doOperatorFunction("*", b);
+}
+
 Matrix Matrix::operator+(Matrix& b) {
 	return doOperatorFunction("+", b);
 }
 
+Matrix Matrix::operator+(double& b) {
+	return doOperatorFunction("+", b);
+}
+
 Matrix Matrix::operator-(Matrix& b) {
+	return doOperatorFunction("-", b);
+}
+
+Matrix Matrix::operator-(double& b) {
 	return doOperatorFunction("-", b);
 }
 
@@ -128,9 +143,28 @@ Matrix Matrix::operator-() {
 	return out;
 }
 
+Matrix Matrix::doOperatorFunction(string anOper, double& b){
+	Matrix out(height, width);
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			if (anOper == "-"){
+				*out.at(i, j) = b - *at(i, j);
+			}
+			else if (anOper == "+"){
+				*out.at(i, j) = *at(i, j) + b;
+			}
+			else if (anOper == "*"){
+				*out.at(i, j) = *at(i, j) * b;
+			}
+		}
+	}
+	return out;
+}
+
 Matrix Matrix::doOperatorFunction(string anOper, Matrix& b){
 	if (width != b.width || height != b.height){
-		throw invalid_argument("matrices not compatible for multiplication: " + dimensions() + " & " + b.dimensions());
+		cout << "matrices not compatible for \"" + anOper + "\": " + dimensions() + " & " + b.dimensions();
+		throw invalid_argument("matrices not compatible for \"" + anOper + "\": " + dimensions() + " & " + b.dimensions());
 	}
 	Matrix out(height, width);
 	for (int i = 0; i < height; i++){

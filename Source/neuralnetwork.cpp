@@ -7,7 +7,7 @@ using namespace std;
 
 #include "../Header/neuralnetwork.h"
 
-NeuralNetwork::NeuralNetwork(vector<int> layers, Matrix inMat, Matrix outMat){
+NeuralNetwork::NeuralNetwork(vector<int> layers, Matrix inMat, Matrix outMat, double scl){
 	if (layers.front() != inMat.width){
 		throw invalid_argument("Network definition doesn't match input matrix");
 	}
@@ -22,6 +22,7 @@ NeuralNetwork::NeuralNetwork(vector<int> layers, Matrix inMat, Matrix outMat){
 		temp.fillRandom();
 		weightMatricies.push_back(temp);
 	}
+	scalar = scl;
 }
 
 double NeuralNetwork::sigmoidPrime(double z){
@@ -67,6 +68,21 @@ void NeuralNetwork::costFuncPrime(){
 		weightChanges.push_back(dotMatrices(history.top().transpose(), temp));
 		history.pop();
 	}
+}
+
+void NeuralNetwork::addToWeightMatricies(){
+	cout << "assdmhaskl" << endl;
+	for (int i = 0; i < weightMatricies.size(); i++){
+		cout << weightMatricies.at(i).toString() << endl;
+		weightMatricies.at(i) = weightMatricies.at(i) - (weightChanges.back() * scalar);
+		weightChanges.pop_back();
+	}
+}
+
+void NeuralNetwork::backProp(){
+	costFuncPrime();
+	addToWeightMatricies();
+	history.push(input);
 }
 
 
