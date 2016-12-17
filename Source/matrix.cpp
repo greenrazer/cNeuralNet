@@ -26,10 +26,19 @@ double* Matrix::at(int x, int y){
 	if (x < 0 || y < 0 || x > height - 1 || y > width - 1){
 		throw invalid_argument("index out of bounds for matrix: " + dimensions());
 	}
+	//cout << " accessing: " << x << ", " << y << " - " << mat[x][y] << endl;
 	return &mat[x][y];
 }
 
-void Matrix::inputData(vector<vector<double>> a){
+double Matrix::get(int x, int y) const{
+	if (x < 0 || y < 0 || x > height - 1 || y > width - 1){
+		throw invalid_argument("index out of bounds for matrix: " + dimensions());
+	}
+	//cout << " accessing: " << x << ", " << y << " - " << mat[x][y] << endl;
+	return mat[x][y];
+}
+
+void Matrix::inputData(const vector<vector<double>>& a){
 		for (int x = 0; x < height; x++){
 			for (int y = 0; y < width; y++){
 				if (a.empty()){
@@ -57,13 +66,13 @@ string Matrix::toString(){
 	return output;
 }
 
-string Matrix::dimensions(){
+string Matrix::dimensions() const{
 	return to_string(height) + "x" + to_string(width);
 }
 
 void Matrix::fillRandom(){
-	double d = 1/(sqrt(width));
-	//double d = 40;
+	double d = 4/(sqrt(width));
+	//double d = 4;
 	double rnd;
 	for (int x = 0; x < height; x++){
 		for (int y = 0; y < width; y++){
@@ -71,6 +80,7 @@ void Matrix::fillRandom(){
 			mat[x][y] = rnd;
 		}
 	}
+	//cout << "random weights: " << endl << toString() << endl;
 }
 
 void Matrix::scale(){
@@ -96,6 +106,7 @@ Matrix Matrix::transpose(){
 			*temp.at(j, i) = mat[i][j];
 		}
 	}
+	//cout << "transpose: " << endl << temp.toString() << endl;
 	return temp;
 }
 
@@ -109,27 +120,27 @@ Matrix::Matrix(){
 
 }
 
-Matrix Matrix::operator*(Matrix& b) {
+Matrix Matrix::operator*(const Matrix& b) {
 	return doOperatorFunction("*", b);
 }
 
-Matrix Matrix::operator*(double& b) {
+Matrix Matrix::operator*(const double& b) {
 	return doOperatorFunction("*", b);
 }
 
-Matrix Matrix::operator+(Matrix& b) {
+Matrix Matrix::operator+(const Matrix& b) {
 	return doOperatorFunction("+", b);
 }
 
-Matrix Matrix::operator+(double& b) {
+Matrix Matrix::operator+(const double& b) {
 	return doOperatorFunction("+", b);
 }
 
-Matrix Matrix::operator-(Matrix& b) {
+Matrix Matrix::operator-(const Matrix& b) {
 	return doOperatorFunction("-", b);
 }
 
-Matrix Matrix::operator-(double& b) {
+Matrix Matrix::operator-(const double& b) {
 	return doOperatorFunction("-", b);
 }
 
@@ -140,28 +151,29 @@ Matrix Matrix::operator-() {
 			*out.at(i, j) = 0 - *at(i, j);
 		}
 	}
+	//cout << "void - matrix: " << endl << out.toString() << endl;
 	return out;
 }
 
-Matrix Matrix::doOperatorFunction(string anOper, double& b){
+Matrix Matrix::doOperatorFunction(string anOper, const double& b){
 	Matrix out(height, width);
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
 			if (anOper == "-"){
-				*out.at(i, j) = b - *at(i, j);
+				*out.at(i, j) = get(i, j) - b;
 			}
 			else if (anOper == "+"){
-				*out.at(i, j) = *at(i, j) + b;
+				*out.at(i, j) = get(i, j) + b;
 			}
 			else if (anOper == "*"){
-				*out.at(i, j) = *at(i, j) * b;
+				*out.at(i, j) = get(i, j) * b;
 			}
 		}
 	}
 	return out;
 }
 
-Matrix Matrix::doOperatorFunction(string anOper, Matrix& b){
+Matrix Matrix::doOperatorFunction(string anOper,const Matrix& b){
 	if (width != b.width || height != b.height){
 		cout << "matrices not compatible for \"" + anOper + "\": " + dimensions() + " & " + b.dimensions();
 		throw invalid_argument("matrices not compatible for \"" + anOper + "\": " + dimensions() + " & " + b.dimensions());
@@ -170,33 +182,54 @@ Matrix Matrix::doOperatorFunction(string anOper, Matrix& b){
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
 			if (anOper == "-"){
-				*out.at(i, j) = *at(i, j) - *b.at(i, j);
+				*out.at(i, j) = get(i, j) - b.get(i, j);
 			}
 			else if (anOper == "+"){
-				*out.at(i, j) = *at(i, j) + *b.at(i, j);
+				*out.at(i, j) = get(i, j) + b.get(i, j);
 			}
 			else if (anOper == "*"){
-				*out.at(i, j) = *at(i, j) * *b.at(i, j);
+				*out.at(i, j) = get(i, j) * b.get(i, j);
 			}
+		}
+	}
+	//cout << "matrix " << anOper << " matrix" <<  endl << out.toString() << endl;
+	return out;
+}
+
+double Matrix::sumUp(){
+	double out = 0;
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			out += get(i, j);
 		}
 	}
 	return out;
 }
 
-Matrix dotMatrices(Matrix a, Matrix b){
+Matrix dotMatrices(const Matrix& a, const Matrix& b){
 	if (a.width != b.height){
 		cout << "matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions();
 		throw invalid_argument("matrices not compatible for dot multiplication: " + a.dimensions() + " & " + b.dimensions());
 	}
+
 	Matrix out(a.height, b.width);
+
 	for (int i = 0; i < a.height; i++){
 		for (int j = 0; j < b.width; j++){
 			for (int q = 0; q < a.width; q++){
-				*out.at(i, j) = *a.at(i, q) * *b.at(q, j);
+				*out.at(i, j) += a.get(i, q) * b.get(q, j);
 			}
 		}
 	}
 	return out;
 }
 
-//Matrix operator+(const Matrix&);
+Matrix pow(const Matrix& a, const double& num){
+	Matrix out(a.height, a.width);
+	for (int i = 0; i < a.height; i++){
+		for (int j = 0; j < a.width; j++){
+			*out.at(i, j) = pow(a.get(i, j), num);
+		}
+	}
+	return out;
+}

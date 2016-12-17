@@ -7,15 +7,16 @@ class NeuralNetwork{
 		vector<Matrix> weightMatricies, weightChanges;
 		stack<Matrix> history;
 		double scalar;
-		Matrix output, expectedOut, input;
+		Matrix output, expectedOut;
 		double sigmoid(double);
 		double sigmoidPrime(double);
-		Matrix activation(Matrix, int);
+		Matrix activation(const Matrix&, int);
 		void costFuncPrime();
 		void addToWeightMatricies();
 	public:
-		NeuralNetwork(vector<int>, Matrix, Matrix, double = 3);
-		Matrix forward();
+		NeuralNetwork(const vector<int>&, const Matrix&, const double&);
+		Matrix forward(const Matrix& inMat);
+		Matrix costFunc();
 		void backProp();
 
 };
