@@ -8,13 +8,13 @@ class NeuralNetwork{
 		stack<Matrix> history;
 		double scalar;
 		Matrix output, expectedOut;
-		double sigmoid(double);
-		double sigmoidPrime(double);
+		double sigmoid(const double&);
+		double sigmoidPrime(const double&);
 		Matrix activation(const Matrix&, int);
 		void costFuncPrime();
 		void addToWeightMatricies();
 	public:
-		NeuralNetwork(const vector<int>&, const Matrix&, const double&);
+		NeuralNetwork(const vector<int>&, const Matrix&, const double& = 3);
 		Matrix forward(const Matrix& inMat);
 		Matrix costFunc();
 		void backProp();

@@ -53,12 +53,12 @@ void Matrix::inputData(const vector<vector<double>>& a){
 	cout << toString();
 }
 
-string Matrix::toString(){
+string Matrix::toString(bool r){
 	string output = "";
 	for (int x = 0; x < height; x++){
 		output += "[ ";
 		for (int y = 0; y < width; y++){
-			output += to_string(mat[x][y]);
+			output += to_string(r ? round(mat[x][y]) : mat[x][y]);
 			output += " ";
 		}
 		output += "]\n";
@@ -71,8 +71,8 @@ string Matrix::dimensions() const{
 }
 
 void Matrix::fillRandom(){
-	double d = 4/(sqrt(width));
-	//double d = 4;
+	//double d = 4/(sqrt(width));
+	double d = 4;
 	double rnd;
 	for (int x = 0; x < height; x++){
 		for (int y = 0; y < width; y++){
@@ -83,7 +83,7 @@ void Matrix::fillRandom(){
 	//cout << "random weights: " << endl << toString() << endl;
 }
 
-void Matrix::scale(){
+double Matrix::scale(){
 	double max = mat[0][0];
 	for (int x = 0; x < height; x++){
 		for (int y = 0; y < width; y++){
@@ -97,6 +97,7 @@ void Matrix::scale(){
 			mat[x][y] /= max;
 		}
 	}
+	return max;
 }
 
 Matrix Matrix::transpose(){
@@ -118,6 +119,33 @@ Matrix::Matrix(int h, int w){
 
 Matrix::Matrix(){
 
+}
+
+Matrix::~Matrix(){
+	for (int x = 0; x < height; x++){
+		delete[] mat[x];
+	}
+	delete [] mat;
+}
+
+void Matrix::initMatrix(const Matrix& x){
+	height = x.height;
+	width = x.width;
+	mat = make2dArray(height, width);
+	for (int i = 0; i < height; i++){
+		for (int j = 0; j < width; j++){
+			mat[i][j] = x.get(i, j);
+		}
+	}
+}
+
+Matrix::Matrix(const Matrix& x){
+	initMatrix(x);
+}
+
+Matrix& Matrix::operator=(const Matrix& x){
+	initMatrix(x);
+	return *this;
 }
 
 Matrix Matrix::operator*(const Matrix& b) {
@@ -151,7 +179,6 @@ Matrix Matrix::operator-() {
 			*out.at(i, j) = 0 - *at(i, j);
 		}
 	}
-	//cout << "void - matrix: " << endl << out.toString() << endl;
 	return out;
 }
 
@@ -192,7 +219,6 @@ Matrix Matrix::doOperatorFunction(string anOper,const Matrix& b){
 			}
 		}
 	}
-	//cout << "matrix " << anOper << " matrix" <<  endl << out.toString() << endl;
 	return out;
 }
 

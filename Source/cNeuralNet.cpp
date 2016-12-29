@@ -52,7 +52,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		{ 1, 1, 1, 1 },
 		{ 0, 0, 0, 0 },
 	};
-	vector<int> networkDefinition { 4, 7, 4 };
+	vector<int> networkDefinition { 4, 5, 4 };
 	Matrix in(16, 4);
 	Matrix out(16, 4);
 	in.inputData(anInput);
@@ -60,15 +60,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	out.inputData(anOutput);
 	in.scale();
 	out.scale();
-	NeuralNetwork NN(networkDefinition,out,10);
+	NeuralNetwork NN(networkDefinition,out,1);
 	cout << endl << endl << endl;
-	for (int i = 0; i < 10000; i++){
-		//cout << "forward" << endl << NN.forward(in).toString() << endl;
-		NN.forward(in);
-		NN.backProp();
+	int a = 1;
+	while (a == 1 || NN.costFunc().sumUp() > 5){
+		for (int i = 0; i < 1000; i++){
+			//cout << "forward" << endl << NN.forward(in).toString() << endl;
+			NN.forward(in);
+			cout << NN.costFunc().sumUp() << endl;
+			NN.backProp();
+		}
+		cout << NN.forward(in).toString(true) << endl;
+		cout << NN.forward(in).toString() << endl;
+		cin >> a;
 	}
-	cout << NN.forward(in).toString() << endl;
-	int a;
-	cin >> a;
 }
 

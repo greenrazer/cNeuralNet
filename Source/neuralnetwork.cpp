@@ -7,7 +7,7 @@ using namespace std;
 
 #include "../Header/neuralnetwork.h"
 
-NeuralNetwork::NeuralNetwork(const vector<int>& layers, const Matrix& outMat, const double& scl = 3){
+NeuralNetwork::NeuralNetwork(const vector<int>& layers, const Matrix& outMat, const double& scl){
 	netDef = layers;
 	expectedOut = outMat;
 	for (size_t i = 1; i < netDef.size(); i++){
@@ -18,19 +18,20 @@ NeuralNetwork::NeuralNetwork(const vector<int>& layers, const Matrix& outMat, co
 	scalar = scl;
 }
 
-double NeuralNetwork::sigmoidPrime(double z){
-	return  exp(-z) / pow((1 + exp(-z)),2);
+double NeuralNetwork::sigmoidPrime(const double& z){
+	return sigmoid(z) * (1 - sigmoid(z));
 }
 
-double NeuralNetwork::sigmoid(double z){
+double NeuralNetwork::sigmoid(const double& z){
 	return 1 / (1 + exp(-z));
 }
 
 Matrix NeuralNetwork::activation(const Matrix& x, int activate = 0){
-	Matrix temp = x;
+	Matrix temp(x.height, x.width);
+	double bias = 3;
 	for (int i = 0; i < temp.height; i++){
 		for (int j = 0; j < temp.width; j++){
-			*temp.at(i, j) = activate == 0 ? sigmoid(*temp.at(i, j)) : sigmoidPrime(*temp.at(i, j));
+			*temp.at(i, j) = ((activate == 0) ? sigmoid(x.get(i, j)+bias) : sigmoidPrime(x.get(i, j)+bias));
 		}
 	}
 	return temp;
@@ -41,41 +42,38 @@ Matrix NeuralNetwork::forward(const Matrix& inMat){
 		throw invalid_argument("Network definition doesn't match input matrix");
 	}
 	history.push(inMat);
-	history.push(dotMatrices(history. top(), weightMatricies.at(0)));
+	history.push(dotMatrices(history.top(), weightMatricies.at(0)));
 	history.push(activation(history.top()));
 	for (size_t i = 1; i < weightMatricies.size(); i++){
 		history.push(dotMatrices(history.top(), weightMatricies.at(i)));
 		history.push(activation(history.top()));
 	}
-	output = history.top();
-	return output;
+	return history.top();
 }
 
 Matrix NeuralNetwork::costFunc(){
-	return pow(expectedOut - output, 2);
+	return pow(expectedOut - history.top(), 2);
 }
 
 void NeuralNetwork::costFuncPrime(){
 	Matrix temp;
-	temp = -(expectedOut - history.top());
+	temp = -(expectedOut - history.top());//works
 	history.pop();
-	temp = temp * activation(history.top(), 1);
+	temp = (temp * activation(history.top(), 1));//works
 	history.pop();
-	weightChanges.push_back(dotMatrices(history.top().transpose(), temp));
+	weightChanges.push_back(dotMatrices(history.top().transpose(), temp));//works
 	history.pop();
 	for (int i = netDef.size() - 3; i >= 0; i--){
-		temp = dotMatrices(temp, weightChanges.at(i).transpose()) * activation(history.top(), 1);
+		temp = (dotMatrices(temp, weightChanges.at(i).transpose()) * activation(history.top(), 1));//works
 		history.pop();
-		weightChanges.push_back(dotMatrices(history.top().transpose(), temp));
+		weightChanges.push_back(dotMatrices(history.top().transpose(), temp));//works
 		history.pop();
 	}
 }
 
 void NeuralNetwork::addToWeightMatricies(){
 	for (size_t i = 0; i < weightMatricies.size(); i++){
-		//cout << "weightMatrix :" << endl << weightMatricies.at(i).toString() << endl;
-		//cout << "change :" << endl << (weightChanges.back() * scalar).toString() << endl;
-		weightMatricies.at(i) = weightMatricies.at(i) - (weightChanges.back() * scalar);
+		weightMatricies.at(i) = (weightMatricies.at(i) - (weightChanges.back() * scalar)); //works
 		weightChanges.pop_back();
 	}
 }
