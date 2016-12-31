@@ -1,3 +1,7 @@
+// Author: Kyle Birnbaum
+// 12/29/2016
+// function comments in Matrix.cpp
+
 class Matrix{
 	private:
 		double** mat;
@@ -11,7 +15,7 @@ class Matrix{
 		double* at(int, int);
 		double get(int, int) const;
 		double scale();
-		void fillRandom();
+		void fillRandom(const double& d = 4);
 		void inputData(const vector<vector<double>>&);
 		string toString(bool round = false);
 		string dimensions() const;

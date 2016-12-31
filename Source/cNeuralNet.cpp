@@ -1,5 +1,6 @@
+// Author: Kyle Birnbaum
+// 12/29/2016
 // cNeuralNet.cpp : Defines the entry point for the console application.
-//
 
 #include "../Header/stdafx.h"
 #include <vector>
@@ -60,15 +61,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	out.inputData(anOutput);
 	in.scale();
 	out.scale();
-	NeuralNetwork NN(networkDefinition,out,1);
+	NeuralNetwork NN(networkDefinition);
 	cout << endl << endl << endl;
 	int a = 1;
-	while (a == 1 || NN.costFunc().sumUp() > 5){
-		for (int i = 0; i < 1000; i++){
-			//cout << "forward" << endl << NN.forward(in).toString() << endl;
+	while (a == 1){
+		for (int i = 0; i < 10000; i++){
 			NN.forward(in);
-			cout << NN.costFunc().sumUp() << endl;
-			NN.backProp();
+			NN.backProp(out);
 		}
 		cout << NN.forward(in).toString(true) << endl;
 		cout << NN.forward(in).toString() << endl;
