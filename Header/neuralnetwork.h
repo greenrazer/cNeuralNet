@@ -18,11 +18,12 @@ class NeuralNetwork{
 		void costFuncPrime(const Matrix&);
 		void addToWeightMatricies(const double&);
 		void clearHistory();
+		void backProp(const Matrix&, const double&);
 	public:
 		NeuralNetwork(const vector<int>&);
 		Matrix forward(const Matrix&);
-		Matrix costFunc(const Matrix&);
-		void backProp(const Matrix&, const double& = 3);
+		void train(const Matrix&, const Matrix&, unsigned int = 1, const double& = 1, bool = false);
+		double costFunc(const Matrix&);
 		vector<Matrix> numGradCheck(const Matrix&, const Matrix&, const double& = 0.00001, const double& = 3);
 
 };

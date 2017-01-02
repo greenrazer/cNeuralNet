@@ -65,9 +65,9 @@ Matrix NeuralNetwork::forward(const Matrix& inMat){
 	return history.top();
 }
 
-Matrix NeuralNetwork::costFunc(const Matrix& outMat){
+double NeuralNetwork::costFunc(const Matrix& outMat){
 	Matrix temp = outMat;
-	return pow(temp - history.top(), 2) * .5;
+	return (pow(temp - history.top(), 2) * .5).sumUp();
 }
 
 void NeuralNetwork::costFuncPrime(const Matrix& outMat){
@@ -100,6 +100,16 @@ void NeuralNetwork::backProp(const Matrix& outMat, const double& scl){
 	addToWeightMatricies(scl);
 }
 
+void NeuralNetwork::train(const Matrix& inMat, const Matrix& outMat, unsigned int times, const double& scl, bool showCost){
+	for (int i = 0; i < times; i++){
+		forward(inMat);
+		if (showCost){
+			cout << costFunc(inMat) << endl;
+		}
+		backProp(outMat, scl);
+	}
+}
+
 vector<Matrix> NeuralNetwork::numGradCheck(const Matrix& inMat, const Matrix& outMat, const double& epsi, const double& scl){
 	vector<Matrix> checkMatricies;
 	forward(inMat);
@@ -111,11 +121,11 @@ vector<Matrix> NeuralNetwork::numGradCheck(const Matrix& inMat, const Matrix& ou
 			for (int q = 0; q < temp.width; q++){
 				*temp.at(j, q) += epsi;
 				forward(inMat);
-				double lossH = costFunc(outMat).sumUp();
+				double lossH = costFunc(outMat);
 
 				*temp.at(j, q) -= (2* epsi);
 				forward(inMat);
-				double lossL = costFunc(outMat).sumUp();
+				double lossL = costFunc(outMat);
 
 				*temp.at(j, q) += epsi;
 				*numGrad.at(j, q) = (lossH - lossL) / (2*epsi);

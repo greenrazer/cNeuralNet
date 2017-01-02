@@ -64,13 +64,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	NeuralNetwork NN(networkDefinition);
 	cout << endl << endl << endl;
 	int a = 1;
-	while (a == 1){
-		for (int i = 0; i < 10000; i++){
-			NN.forward(in);
-			NN.backProp(out);
-		}
-		cout << NN.forward(in).toString(true) << endl;
-		cout << NN.forward(in).toString() << endl;
+	while (a == 1 || a == 2){
+		NN.train(in, out, 100);
+		cout << NN.forward(in).toString(a==2) << endl;
 		cin >> a;
 	}
 }
